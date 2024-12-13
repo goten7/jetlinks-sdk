@@ -8,11 +8,22 @@ import org.jetlinks.core.metadata.types.IntType;
 import org.jetlinks.core.metadata.types.ObjectType;
 import org.jetlinks.core.metadata.types.StringType;
 import org.junit.jupiter.api.Test;
+import org.springframework.core.ResolvableType;
 import reactor.core.publisher.Flux;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
 class GeneratorHelperTest {
+
+    public static void main(String[] args) {
+        ResolvableType resolvableType = ResolvableType.forClassWithGenerics(
+            AbstractCommand.class,
+            ResolvableType.forClassWithGenerics(Flux.class, Serializable.class),
+            ResolvableType.forClass(String.class)
+        );
+        System.out.println(resolvableType.toString());
+    }
 
 
     @Test
@@ -35,7 +46,12 @@ class GeneratorHelperTest {
             )
             .addImport(AbstractCommand.class)
             .addImport(Flux.class)
-            .extendsClass("AbstractCommand<Flux<Object>,TestCommand>")
+            .extendsClass(ResolvableType.forClassWithGenerics(
+                AbstractCommand.class,
+                ResolvableType.forClassWithGenerics(Flux.class, Serializable.class),
+                ResolvableType.forClass(String.class)
+            ))
+//            .extendsClass("AbstractCommand<Flux<Object>,TestCommand>")
             .generate();
 
         System.out.println(clazz);

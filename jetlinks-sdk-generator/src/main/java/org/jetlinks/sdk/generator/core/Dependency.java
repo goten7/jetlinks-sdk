@@ -13,7 +13,7 @@ public class Dependency extends Artifact {
     private String classifier;
     private String type;
     private String systemPath;
-    private boolean optional;
+    private Boolean optional;
 
     public static Dependency of(String artifact) {
         Dependency dependency = new Dependency();

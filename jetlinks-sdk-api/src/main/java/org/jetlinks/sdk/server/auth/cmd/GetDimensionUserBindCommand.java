@@ -1,5 +1,6 @@
 package org.jetlinks.sdk.server.auth.cmd;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.jetlinks.core.command.AbstractConvertCommand;
 import org.jetlinks.core.command.CommandHandler;
 import org.jetlinks.core.command.CommandUtils;
@@ -27,10 +28,12 @@ import java.util.function.Function;
  * @see org.hswebframework.web.authorization.Authentication
  * @since 1.0
  */
+@Schema(title = "批量查询维度绑定用户id", description = "提供维度类型及维度id")
 public class GetDimensionUserBindCommand extends AbstractConvertCommand<Flux<DimensionUserBindInfo>, GetDimensionUserBindCommand> {
     private static final long serialVersionUID = 1L;
 
 
+    @Schema(title = "维度信息")
     public List<DimensionUserBindRequset> getDimensions() {
         return ConverterUtils.convertToList(readable().get("dimensions"), DimensionUserBindRequset::of);
     }
@@ -49,25 +52,25 @@ public class GetDimensionUserBindCommand extends AbstractConvertCommand<Flux<Dim
 
 
     public static CommandHandler<GetDimensionUserBindCommand, Flux<DimensionUserBindInfo>> createHandler(
-            Function<GetDimensionUserBindCommand, Flux<DimensionUserBindInfo>> handler
+        Function<GetDimensionUserBindCommand, Flux<DimensionUserBindInfo>> handler
     ) {
         return CommandHandler.of(
-                () -> {
-                    SimpleFunctionMetadata metadata = new SimpleFunctionMetadata();
-                    metadata.setId(CommandUtils.getCommandIdByType(GetDimensionUserBindCommand.class));
-                    metadata.setName("根据维度查询对应用户id");
-                    metadata.setDescription("根据维度类型id查询对应所属的用户id");
-                    metadata.setInputs(
-                            Collections.singletonList(SimplePropertyMetadata.of("dimensions", "维度信息", new ObjectType()
-                                    .addProperty("type", "维度类型", StringType.GLOBAL)
-                                    .addProperty("id", "维度id", StringType.GLOBAL)
-                            ))
-                    );
-                    return metadata;
-                },
-                (cmd, ignore) -> handler.apply(cmd),
-                () -> new GetDimensionUserBindCommand()
-                        .withConverter(CommandUtils.createConverter(ResolvableType.forType(DimensionUserBindInfo.class)))
+            () -> {
+                SimpleFunctionMetadata metadata = new SimpleFunctionMetadata();
+                metadata.setId(CommandUtils.getCommandIdByType(GetDimensionUserBindCommand.class));
+                metadata.setName("根据维度查询对应用户id");
+                metadata.setDescription("根据维度类型id查询对应所属的用户id");
+                metadata.setInputs(
+                    Collections.singletonList(SimplePropertyMetadata.of("dimensions", "维度信息", new ObjectType()
+                        .addProperty("type", "维度类型", StringType.GLOBAL)
+                        .addProperty("id", "维度id", StringType.GLOBAL)
+                    ))
+                );
+                return metadata;
+            },
+            (cmd, ignore) -> handler.apply(cmd),
+            () -> new GetDimensionUserBindCommand()
+                .withConverter(CommandUtils.createConverter(ResolvableType.forType(DimensionUserBindInfo.class)))
         );
     }
 }

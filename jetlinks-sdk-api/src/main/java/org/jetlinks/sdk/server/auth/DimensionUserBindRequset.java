@@ -1,5 +1,6 @@
 package org.jetlinks.sdk.server.auth;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import org.hswebframework.web.bean.FastBeanCopier;
 
@@ -17,7 +18,9 @@ import java.util.Map;
 @AllArgsConstructor
 @ToString
 public class DimensionUserBindRequset implements Serializable {
+    @Schema(title = "维度类型")
     private String type;
+    @Schema(title = "维度id")
     private String id;
 
     @SuppressWarnings("all")

@@ -4,8 +4,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetlinks.core.command.AbstractConvertCommand;
+import org.jetlinks.core.command.CommandUtils;
 import org.jetlinks.core.command.GenericInputCommand;
 import org.jetlinks.sdk.server.utils.ConverterUtils;
+import org.springframework.core.ResolvableType;
 import reactor.core.publisher.Flux;
 
 import java.util.Arrays;
@@ -23,7 +25,7 @@ import java.util.function.Function;
 @Getter
 @Setter
 public abstract class BatchDataCommand<T, Self extends BatchDataCommand<T, Self>> extends AbstractConvertCommand<Flux<T>, Self>
-implements GenericInputCommand<T> {
+    implements GenericInputCommand<T> {
 
     public static final String PARAMETER_KEY = "data";
 
@@ -39,9 +41,17 @@ implements GenericInputCommand<T> {
         return castSelf();
     }
 
+    @Deprecated
     @SuppressWarnings("all")
     public final <E extends T> List<E> dataList() {
         return dataList(v -> (E) createResponseData(v));
+    }
+
+    @SuppressWarnings("all")
+    public final <E extends T> List<E> dataList(Class<E> target) {
+        return dataList(v -> (E) CommandUtils.convertData(
+            ResolvableType.forType(target),
+            v));
     }
 
     public final <E extends T> List<E> dataList(Function<Object, E> converter) {

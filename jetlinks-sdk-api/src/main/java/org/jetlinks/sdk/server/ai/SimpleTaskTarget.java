@@ -12,14 +12,9 @@ import lombok.Setter;
 public class SimpleTaskTarget implements TaskTarget {
     private String value;
     private String text;
-    private int ordinal;
+    private String description;
 
     public static TaskTarget of(String value, String text) {
-        return SimpleTaskTarget.of(value, text, 0);
-    }
-
-    @Override
-    public int ordinal() {
-        return ordinal;
+        return SimpleTaskTarget.of(value, text, text);
     }
 }

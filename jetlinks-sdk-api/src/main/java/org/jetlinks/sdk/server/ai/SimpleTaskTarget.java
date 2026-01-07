@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.function.Supplier;
+
 @AllArgsConstructor(staticName = "of")
 @NoArgsConstructor
 @Getter
@@ -16,5 +18,10 @@ public class SimpleTaskTarget implements TaskTarget {
 
     public static TaskTarget of(String value, String text) {
         return SimpleTaskTarget.of(value, text, text);
+    }
+
+    @Override
+    public Supplier<? extends AiOutput<?>> getAiOutputInstance() {
+        return GenericAiOutput::new;
     }
 }

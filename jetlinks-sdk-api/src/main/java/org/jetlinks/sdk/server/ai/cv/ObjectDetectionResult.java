@@ -1,5 +1,6 @@
 package org.jetlinks.sdk.server.ai.cv;
 
+import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Maps;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;

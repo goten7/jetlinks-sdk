@@ -79,11 +79,6 @@ public enum InternalCVTaskTarget implements TaskTarget {
     }
 
     @Override
-    public Mono<AiOutputMetadata> getAiOutputMetadata() {
-        return Mono.just(ObjectDetectionCommand.aiOutputMetadata);
-    }
-
-    @Override
     public String getValue() {
         return name();
     }

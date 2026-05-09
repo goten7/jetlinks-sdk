@@ -1,12 +1,12 @@
 package org.jetlinks.sdk.server.ai.cv;
 
+import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Maps;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections4.CollectionUtils;
 import org.hswebframework.web.bean.FastBeanCopier;
-import org.jetlinks.core.GenericHeaderSupport;
 import org.jetlinks.core.utils.SerializeUtils;
 import org.jetlinks.sdk.server.file.FileData;
 
@@ -22,16 +22,13 @@ import java.util.*;
 public class ObjectDetectionResult extends AiCommandResult<ObjectDetectionResult> {
 
     public static final String IMAGES = "images";
-    public static final String OBJECTS = "objects";
+    public static final String SCHEMA_KEY = "objects";
 
     @Schema(title = "图像数据")
     private List<ImageData> images;
 
     @Schema(title = "检测到的对象")
     private List<DetectedObject> objects;
-
-    @Schema(title = "其他信息")
-    private Map<String, Object> others;
 
     @Override
     public List<? extends FileData> files() {
@@ -40,36 +37,24 @@ public class ObjectDetectionResult extends AiCommandResult<ObjectDetectionResult
 
     @Override
     public Map<String, Object> schemaMap() {
-        return Collections.singletonMap(OBJECTS, objects);
+        return Collections.singletonMap(SCHEMA_KEY, objects);
+    }
+
+    @Override
+    public JSONObject toJson() {
+        return toJson0();
     }
 
     @Override
     public Map<String, Object> toLightWeighMap() {
-        Map<String, Object> map = FastBeanCopier.copy(this, new HashMap<>(), IMAGES);
+        return toJson0();
+    }
+
+    private JSONObject toJson0() {
+        JSONObject map = FastBeanCopier.copy(this, new JSONObject(), IMAGES);
         map.put(IMAGES, imagesToSimpleMap());
         return map;
     }
-
-    @Override
-    public List<Map<String, Object>> flat() {
-        List<Map<String, Object>> maps;
-        List<Map<String, Object>> _images = imagesToSimpleMap();
-        if (CollectionUtils.isNotEmpty(objects)) {
-            maps = new ArrayList<>(objects.size());
-            for (DetectedObject object : objects) {
-                FlatData from = FlatData.from(this, object);
-                Map<String, Object> data = FastBeanCopier.copy(from, new HashMap<>());
-                data.put(IMAGES, _images);
-                maps.add(data);
-            }
-        } else {
-            Map<String, Object> copy = FastBeanCopier.copy(this, new HashMap<>(), IMAGES, "objects");
-            copy.put(IMAGES, _images);
-            maps = Collections.singletonList(copy);
-        }
-        return maps;
-    }
-
 
     private List<Map<String, Object>> imagesToSimpleMap() {
         if (CollectionUtils.isNotEmpty(images)) {
@@ -161,8 +146,6 @@ public class ObjectDetectionResult extends AiCommandResult<ObjectDetectionResult
                 object.writeExternal(out);
             }
         }
-
-        SerializeUtils.writeKeyValue(others, out);
     }
 
     @Override
@@ -191,60 +174,6 @@ public class ObjectDetectionResult extends AiCommandResult<ObjectDetectionResult
         } else {
             objects = new ArrayList<>(0);
         }
-        others = SerializeUtils.readMap(in, Maps::newHashMapWithExpectedSize);
-    }
-
-
-    @Getter
-    @Setter
-    public static class FlatData extends GenericHeaderSupport<FlatData> {
-        @Schema(title = "数据id")
-        private String outputId;
-
-        @Schema(title = "是否成功响应")
-        private boolean success;
-
-        @Schema(title = "错误信息")
-        private String errorMessage;
-
-        @Schema(title = "错误码")
-        private String errorCode;
-
-        @Schema(title = "时间戳")
-        private long timestamp;
-
-        @Schema(description = "目标检测源id,例如视频源id")
-        private String sourceId;
-
-        @Schema(title = "对象ID")
-        private String objectId;
-
-        @Schema(title = "标签")
-        private String label;
-
-        @Schema(title = "置信度")
-        private float score;
-
-        @Schema(title = "边框")
-        private float[] box;
-
-        @Schema(title = "标注信息")
-        private Map<String, Object> annotations;
-
-        @Schema(title = "对象其他信息")
-        private Map<String, Object> objectOthers;
-
-        @Schema(title = "其他信息")
-        private Map<String, Object> others;
-
-
-        public static FlatData from(ObjectDetectionResult result, DetectedObject object) {
-            FlatData copy = FastBeanCopier.copy(result, new FlatData(), "images", "objects");
-            FlatData data = FastBeanCopier.copy(object, copy, "others");
-            data.setObjectOthers(object.getOthers());
-            return data;
-        }
-
     }
 
 }
